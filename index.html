@@ -8,6 +8,10 @@
 <meta name="keywords" content="Luna, Priyn, luna.priyn.com, local-first AI assistant, private AI, autonomous AI, voice assistant, agentic assistant, personal intelligence layer">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://luna.priyn.com/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/luna-favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/luna-favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/luna-favicon-192.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Luna — Personal Intelligence, in Motion">
 <meta property="og:description" content="A private, local-first autonomous intelligence layer built for Priyn.">
@@ -452,6 +456,13 @@ linear-gradient(145deg,#111522,#080a11);border:1px solid rgba(255,255,255,.08);b
 .intro-stage-caption{margin:14px 5px 0;font-size:.69rem}
 .intro-stage .hero-film{width:100%;aspect-ratio:16/9;min-height:0;max-height:none;border-radius:34px;box-shadow:0 34px 90px rgba(12,15,30,.14);cursor:default}
 .intro-stage .hero-film iframe{pointer-events:none}
+.intro-audio-toggle{position:absolute;right:18px;bottom:18px;z-index:9;display:inline-flex;align-items:center;gap:9px;height:42px;padding:0 14px;border:1px solid rgba(255,255,255,.20);border-radius:999px;background:rgba(8,10,16,.58);backdrop-filter:blur(16px) saturate(1.25);-webkit-backdrop-filter:blur(16px) saturate(1.25);color:#fff;font:600 .78rem Manrope,Inter,sans-serif;letter-spacing:.01em;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.18);transition:background .2s ease,transform .2s ease,border-color .2s ease;pointer-events:auto}
+.intro-audio-toggle:hover{background:rgba(8,10,16,.76);border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
+.intro-audio-toggle svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.intro-audio-toggle .sound-on{display:none}
+.intro-audio-toggle.is-unmuted .sound-off{display:none}
+.intro-audio-toggle.is-unmuted .sound-on{display:block}
+@media(max-width:600px){.intro-audio-toggle{right:12px;bottom:12px;height:38px;padding:0 12px}.intro-audio-toggle span{display:none}}
 .intro-stage .hero-film.is-focused{width:100%;aspect-ratio:16/9;border-radius:34px;cursor:default}
 
 @media(max-width:900px){
@@ -496,6 +507,11 @@ linear-gradient(145deg,#111522,#080a11);border:1px solid rgba(255,255,255,.08);b
       <div class="intro-stage-label"><span>01</span><strong>Luna in motion</strong></div>
       <div class="hero-film" id="lunaFilm" aria-label="Luna introduction video.">
                 <iframe id="lunaFilmFrame" title="Luna introduction video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <button class="intro-audio-toggle" id="lunaAudioToggle" type="button" aria-label="Unmute Luna video" aria-pressed="false">
+          <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="m17 9 4 4"></path><path d="m21 9-4 4"></path></svg>
+          <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>
+          <span>Sound</span>
+        </button>
       </div>
       <div class="intro-stage-caption"><span>Autonomous. Local-first. Personal.</span><span>Luna in motion</span></div>
     </div>
@@ -600,10 +616,24 @@ linear-gradient(145deg,#111522,#080a11);border:1px solid rgba(255,255,255,.08);b
 const lunaFilm=document.getElementById('lunaFilm');
 const lunaFilmFrame=document.getElementById('lunaFilmFrame');
 const lunaVideoId='SW7m6Dh-9ng';
-const lunaAmbient=`https://www.youtube-nocookie.com/embed/${lunaVideoId}?autoplay=1&mute=1&loop=1&playlist=${lunaVideoId}&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0`;
+const lunaAmbient=`https://www.youtube-nocookie.com/embed/${lunaVideoId}?autoplay=1&mute=1&loop=1&playlist=${lunaVideoId}&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0&enablejsapi=1`;
 
 if(lunaFilmFrame) lunaFilmFrame.src=lunaAmbient;
 if(lunaFilm) lunaFilm.classList.remove('is-focused');
+
+const lunaAudioToggle=document.getElementById('lunaAudioToggle');
+let lunaMuted=true;
+function lunaPlayerCommand(func,args=[]){
+  lunaFilmFrame?.contentWindow?.postMessage(JSON.stringify({event:'command',func,args}),'*');
+}
+lunaAudioToggle?.addEventListener('click',e=>{
+  e.stopPropagation();
+  lunaMuted=!lunaMuted;
+  lunaPlayerCommand(lunaMuted?'mute':'unMute');
+  lunaAudioToggle.classList.toggle('is-unmuted',!lunaMuted);
+  lunaAudioToggle.setAttribute('aria-pressed',String(!lunaMuted));
+  lunaAudioToggle.setAttribute('aria-label',lunaMuted?'Unmute Luna video':'Mute Luna video');
+});
 
 
 const introStage=document.getElementById('intro-film');
